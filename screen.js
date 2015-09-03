@@ -1,40 +1,10 @@
-Number.prototype.square = function () {
-  return Math.pow(this, 2);
-};
 
-SVGElement.prototype.set = function (prop, value) {
-  if (prop instanceof Object) {
-    for (var key in prop) {
-      this.setAttribute(key, prop[key]);
-    }
-  } else {
-    this.setAttribute(prop, value);
-  }
-};
-
-Math.radians = function(degrees) {
-  return degrees * Math.PI / 180;
-};
-
-Math.degrees = function(radians) {
-  return radians * 180 / Math.PI;
-};
-
-bloc.prepare('viewer', function () {
+bloc.prepare('viewer', function () {  
   var clock = new SVG(document.body, {
-    height: window.innerHeight,
-    width: window.innerWidth,
+    height: coords.h,
+    width: coords.w,
     id: 'trace'
   });
-  
-  var coords = {
-    w: window.innerWidth,
-    h: window.innerHeight,
-    cx: window.innerWidth / 2,
-    cy: window.innerHeight / 2,
-  };
-  
-  console.log(coords);
   
   var grid = clock.createElement('g', {'class': 'grid'});
   var note = clock.createElement('g', {'class': 'annotation'});
@@ -83,10 +53,11 @@ bloc.prepare('viewer', function () {
     cx: coords.cx,
     cy: coords.cy,
     r: 1
-  });
+  }, grid);
+  
   document.body.style.height = window.innerHeight + 'px';
   
-  document.body.addEventListener('mousemove', function (evt) {
+  boundary.addEventListener('mousemove', function (evt) {
     var theta  = Math.round(evt.theta());
     var radius = Math.round(Math.sqrt((evt.layerX - coords.cx).square() + (coords.cy - evt.layerY).square()));
     

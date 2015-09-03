@@ -16,6 +16,33 @@ Event.prototype.theta = function () {
   return theta < 0 ? 360 + theta : theta;
 };
 
+Number.prototype.square = function () {
+  return Math.pow(this, 2);
+};
+
+SVGElement.prototype.set = function (prop, value) {
+  if (prop instanceof Object) {
+    for (var key in prop) {
+      this.setAttribute(key, prop[key]);
+    }
+  } else {
+    this.setAttribute(prop, value);
+  }
+};
+
+SVGElement.prototype.get = function (prop) {
+  return parseInt(this.getAttribute(prop), 10);
+};
+
+Math.radians = function(degrees) {
+  return degrees * Math.PI / 180;
+};
+
+Math.degrees = function(radians) {
+  return radians * 180 / Math.PI;
+};
+
+
 
 /* Animation function
  */
@@ -115,3 +142,20 @@ SVG.prototype.b64url = function (styles) {
       style.textContent = styles;
   return 'url(data:image/svg+xml;base64,'+btoa(wrapper.innerHTML)+')';
 };
+
+var getCoords = function(evt) {
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  
+  this.coords = {
+    w: width,
+    h: height,
+    cx: window.innerWidth / 2,
+    cy: window.innerHeight / 2
+  };
+};
+
+window.addEventListener('resize', getCoords, false);
+
+
+getCoords();
