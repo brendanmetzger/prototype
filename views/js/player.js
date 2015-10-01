@@ -87,6 +87,7 @@ div.style.border    = '1px solid #333';
 div.style.padding   = '5em';
 div.style.boxSizing = 'border-box';
 div.style.position  = 'absolute';
+div.style.top       = 0;
 div.style.display   = 'none';
 div.textContent     = "click anywhere to resume";
 

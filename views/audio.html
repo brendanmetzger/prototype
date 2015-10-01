@@ -32,8 +32,16 @@
 
       var ul = document.body.appendChild(document.createElement('ul'));
       
+      ul.classList.add('clickable');
       ul.addEventListener('click', function (evt) {
+        if (evt.target.nodeName !== 'LI') return;
         var idx = Number(evt.target.dataset.idx);
+
+        [].forEach.call(ul.childNodes, function (node) {
+          node.removeAttribute('class');
+        });
+        
+        evt.target.className = 'active';
         player.play(idx);
       }, false);
       

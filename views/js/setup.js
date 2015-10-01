@@ -12,8 +12,8 @@ String.prototype.format = function() {
 
 Event.prototype.theta = function () {
   var rect  = this.target.getBoundingClientRect();
-  var theta = Math.atan2((this.offsetX || this.layerX) - (rect.width / 2), (rect.height / 2) - (this.offsetY || this.layerY)) * (180 / Math.PI);
-  return theta < 0 ? 360 + theta : theta;
+  var offset = [(this.offsetX || this.layerX) - rect.left, (this.offsetY || this.layerY) - rect.top];
+  return (180 / Math.PI) * Math.atan2(offset[0] - (rect.width / 2), (rect.height / 2) - offset[1]);
 };
 
 Number.prototype.square = function () {

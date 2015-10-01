@@ -2,7 +2,27 @@ body {
   font-family:'Avenir Next';
   font-weight:400;
   margin:0;
-  height:100vh;
+  height:95vh;
+  padding-top:5vh;
+}
+
+body > header {
+  position:fixed;
+  background-color:#eee;
+  width:100%;
+  z-index:1000;
+  top:0;
+}
+
+header nav ul {
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+header nav ul li {
+  display: inline-block;
+  padding:0.25em;
 }
 
 body[class] {
@@ -18,8 +38,8 @@ svg#trace {
 }
 
 svg line {
-  stroke:#00a4e4;
-  stroke-width:2;
+  stroke:#444;
+  stroke-width:1;
 }
 
 svg circle {
@@ -35,4 +55,20 @@ svg circle {
 .grid line, .grid circle {
   stroke-width:1;
   stroke:#888;
+}
+ul.clickable {
+  list-style:none;
+  padding:0;
+  margin:1em;
+}
+ul.clickable li {
+  cursor:pointer;
+  border:1px solid #333;
+  padding:0.25em;
+  margin:0.25em;
+}
+
+ul.clickable li:hover, li.active {
+  background-color:#333;
+  color:#fff;
 }
