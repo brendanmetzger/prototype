@@ -2,6 +2,12 @@ body {
   font-family:'Avenir Next';
   font-weight:400;
   margin:0;
+  height:100vh;
+}
+
+body[class] {
+  background:transparent url(flow-diagram.svg) no-repeat -35px 20px;
+  background-size: 100% 100%;
 }
 
 svg#trace {
@@ -28,5 +34,5 @@ svg circle {
 
 .grid line, .grid circle {
   stroke-width:1;
-  stroke:#eee;
+  stroke:#888;
 }

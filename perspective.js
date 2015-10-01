@@ -8,7 +8,14 @@ bloc.prepare('perspective', function () {
   
   
   var grid = paper.createElement('g', {'class': 'grid'});
-  grid = drawPerspective(grid, Math.floor(coords.h / 4 * 2.5));
+  grid = drawPerspective(grid, [coords.cx, Math.floor(coords.h / 4 * 2.5)]);
+  
+  // var square = paper.createElement('rect', {
+  //   x: 0,
+  //   y: 0,
+  //   width:100,
+  //   height:100
+  // });
 });
 
 
@@ -33,8 +40,8 @@ var intersection = function (lineA, lineB) {
   return [numx / denom, numy / denom];
 };
 
-function drawPerspective(grid, horizon) {
-  
+function drawPerspective(grid, vanishing_point) {
+  var horizon = vanishing_point[1];
   var guide = paper.createElement('line', {
     style: 'stroke:none',
     x1:0,
@@ -42,16 +49,19 @@ function drawPerspective(grid, horizon) {
     x2: coords.w,
     y2: coords.h
   });
+  
+  var horizontals = paper.createElement('g', {
+    id: 'horizontal'
+  }, grid);
 
-  var density = 10;
+  var density = 5;
   var vlines = [];
   var hlines = [];
   var space = coords.w / density;
   
-  
-  for (var i = (-4 * density); i <= (density * 8); i++) {
+  for (var i = (-2 * density); i <= (density * 4); i++) {
     vlines[i] = paper.createElement('line', {
-      x1: coords.cx,
+      x1: vanishing_point[0],
       y1: horizon,
       x2: space * i,
       y2: coords.h
@@ -59,13 +69,12 @@ function drawPerspective(grid, horizon) {
     
     var intersect = intersection(guide, vlines[i]);
     if (intersect[1] > horizon) {
-      
       hlines.push(paper.createElement('line', {
         x1: 0,
         y1: intersect[1],
         x2: coords.w,
         y2: intersect[1]
-      }, grid));
+      }, horizontals));
     }
     
     var trim = intersection(hlines[0], vlines[i]);
@@ -83,6 +92,8 @@ function drawPerspective(grid, horizon) {
 function movePerspective(input) {
   var grid = paper.createElement('g', {'class': 'grid'});
   paper.element.replaceChild(grid, paper.element.querySelector('g.grid'));
-  
-  grid = drawPerspective(grid, Math.floor((coords.h * (input.value / 100)) / 4 * 2.5));
+  var y = Math.floor(coords.h * (input[0].value / 100));
+  var x = coords.w * input[1].value / 1000;
+  console.log(coords.cx - x);
+  grid = drawPerspective(grid, [x, y]);
 }

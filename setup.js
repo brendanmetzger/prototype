@@ -115,7 +115,7 @@ Request.prototype = {
 
 
 /* Quick way to create an SVG element with and a prototypal method
- * to create children elements. Used in Progress and Player.Button
+ * to create children elements.
  */ 
 var SVG = function (node, options) {
   options['xmlns:xlink'] = 'http://www.w3.org/1999/xlink';
@@ -159,3 +159,5 @@ window.addEventListener('resize', getCoords, false);
 
 
 getCoords();
+
+
