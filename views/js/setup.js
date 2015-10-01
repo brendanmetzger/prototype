@@ -76,8 +76,6 @@ window.Adjust = function () {
   var scroller = Animate(function (element) {
     var ratio = Math.min(1, 1 - Math.pow(1 - (Date.now() - this.start) / this.duration, 5)); // float % anim complete 
     var y = ratio >= 1 ? this.to : ( ratio * ( this.to - this.from ) ) + this.from;
-  
-    // element.setAttribute('x', x);
     element.scrollTo(0,y);
     return (ratio < 1);
   });
