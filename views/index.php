@@ -23,11 +23,7 @@ $app->prepare('http-request', function ($app, $params) {
   $router  = new Router('controllers', $request);
   
   // default controller and action as arguments, in case nothin doin in the request
-  $response->setBody($router->delegate('explore', 'index'));
-  
-
-  $app->execute('debug', $response);
-
+  $response->setBody($router->delegate('graph', 'index'));
   
   echo $response;
 });

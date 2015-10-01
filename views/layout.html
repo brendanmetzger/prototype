@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Prototype</title>
+    <base href="/prototypes/knight/" />
+    <title>[$title]</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta charset="utf-8" />
     <meta name="msapplication-tap-highlight" content="no" />
@@ -22,17 +23,26 @@
           prepare: function(k, f) {if (typeof f === 'function') c[k] = f; else return c[k] || function() {};}
       };}(document, window, {}, [], []));
       
-      bloc.embed('./setup.js');
-      bloc.embed('./screen.js');
+      bloc.embed('./js/setup.js');
       // ]]>
     </script>
-    <link rel="stylesheet" type="text/css" href="screen.css" />
+    <link rel="stylesheet" type="text/css" href="./assets/screen.css" />
   </head>
   
-  <body class="nothing" data-user="">
-    <nav style="position:relative;z-index:100">
-      <input type="range" name="simulate" value="0" min="0" max="300" oninput="console.log(this.value);" />
-    </nav>
+  <body class="[$action]" data-user="">
+    <header>
+      <nav>
+        <ul>
+          <li><a href="graph">Home</a></li>
+          <li><a href="graph/audio">Audio List</a></li>
+        </ul>
+      </nav>
+    </header>
+    
+    <!-- replace main nextSibling -->
+    <main>
+      <h1>Knight Prototype work</h1>
+    </main>
     <script type="text/javascript">
       window.bloc.load();
     </script>
