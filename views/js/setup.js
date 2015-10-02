@@ -5,7 +5,7 @@
  */
 String.prototype.format = function() {
   var args = typeof arguments[0] === 'object' ? arguments[0] : arguments;
-  return this.replace(/{((?:\d+)|(?:[a-z]+))}/g, function(match, key) {
+  return this.replace(/{((?:\d+)|(?:[a-z0-9]+))}/g, function(match, key) {
     return typeof args[key] != 'undefined' ? args[key] : match;
   });
 };
@@ -13,7 +13,7 @@ String.prototype.format = function() {
 Event.prototype.theta = function () {
   var rect  = this.target.getBoundingClientRect();
   var offset = [(this.offsetX || this.layerX) - rect.left, (this.offsetY || this.layerY) - rect.top];
-  return (180 / Math.PI) * Math.atan2(offset[0] - (rect.width / 2), (rect.height / 2) - offset[1]);
+  return Math.atan2(offset[0] - (rect.width / 2), (rect.height / 2) - offset[1]);
 };
 
 Number.prototype.square = function () {

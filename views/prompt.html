@@ -1,4 +1,31 @@
 <main>
+  <style type="text/css" media="screen">
+    /* <![CDATA[ */
+    text {
+      text-anchor: middle;
+      font-family:Avenir, Helvetica;
+      font-weight:200;
+    }
+    
+    .grid text {
+      fill:#AAA;
+      letter-spacing:0.25em;
+    }
+    
+    .grid path {
+      fill-opacity:0.5;
+    }
+    
+    .grid path:hover {
+      fill-opacity:0.5;
+    }
+    
+    .annotation text {
+      font-family:'Courier New';
+    }
+    
+    /* ]]> */
+  </style>
   <script type="text/javascript">
     // <![CDATA[
 
@@ -8,69 +35,106 @@
           width: coords.w,
           id: 'trace'
         });
-        
 
+        var domain = [
+          {
+            color:'#EAF7B4',
+            title:'control'
+          },
+          {
+            color:'#98F698',
+            title:'relaxation'
+          },
+          {
+            color:'#C1E8E1',
+            title:'boredom'
+          },
+          {
+            color:'#98B7E6',
+            title:'apathy'
+          },
+          {
+            color:'#D9CDEC',
+            title:'worry'
+          },
+          {
+            color:'#F69898',
+            title:'anxiety'
+          },
+          {
+            color:'#F8EBB5',
+            title:'arousal'
+          },
+          {
+            color:'#F6F697',
+            title:'flow'
+          }
+        ];
         
-        var defs = clock.createElement('defs');
-        var gradient = clock.createElement('radialGradient', {
-          id: 'gradientFlow'
-        }, defs);
-
-        var colors = ["#F8EBB7", "#F6F69C", "#EAF7B4", "#9CF69C", "#C3E9E1", "#9DBAE7", "#D9CDEC", "#F59898"];
-        for (var i = 0; i < colors.length; i++) {
-          clock.createElement('stop', {
-            'offset': Math.round((i / colors.length) * 100) + '%',
-            'stop-color': colors[i],
-            'stop-opacity': 1
-          }, gradient);
+        var amplitude = clock.createElement('path', {
+        }, grid);
+        
+        var grid   = clock.createElement('g', {'class': 'grid'});
+        var note   = clock.createElement('g', {'class': 'annotation'});
+        var legend = new Uint8Array(360);
+        var eighth = (Math.PI / 8)
+        
+        for (var i = 0; i < domain.length; i++) {
+          var rad_pos = ((2 * Math.PI) / domain.length) * i;
+          
+          var start  = (rad_pos - eighth) * (180 / Math.PI);
+          var finish = (rad_pos + eighth) * (180 / Math.PI);
+          
+          while (start < finish) {
+            legend[Math.floor(start > 0 ? start : start + 360)] = i;
+            start+=1;
+          }
+          
+          clock.createElement('line', {
+            x1: Math.cos(rad_pos) * (coords.cy - 10) + coords.cx,
+            y1: Math.sin(rad_pos) * (coords.cy - 10) + coords.cy,
+            x2: Math.cos(rad_pos) * coords.cy + coords.cx,
+            y2: Math.sin(rad_pos) * coords.cy + coords.cy,
+            r:5
+          }, grid);
+          
+          domain[i].segment = clock.createElement('path', {
+            id: domain[i].color,
+            style: "fill:" + domain[i].color,
+            d: "M{mx},{my}L{x1},{y1}A{r},{r},0 0 0 {x2}, {y2}z".format({
+              r: coords.cy / 2.5,
+              mx: coords.cx,
+              my: coords.cy,
+              x1: Math.cos(rad_pos - eighth) * coords.cy + coords.cx,
+              y1: Math.sin(rad_pos - eighth) * coords.cy + coords.cy,
+              x2: Math.cos(rad_pos + eighth) * coords.cy + coords.cx,
+              y2: Math.sin(rad_pos + eighth) * coords.cy + coords.cy,
+            })
+          }, grid);
+          
+          clock.createElement('text', {
+            x: Math.cos(rad_pos) * (coords.cy * 0.85) + coords.cx,
+            y: Math.sin(rad_pos) * (coords.cy * 0.85) + coords.cy,
+            dy: 5
+          }, grid).textContent = domain[i].title;
         }
-      
-
-        
-        var grid = clock.createElement('g', {'class': 'grid'});
-        var note = clock.createElement('g', {'class': 'annotation'});
-
-        clock.createElement('line', {
-          x1: 0,
-          y1: coords.cy,
-          x2: coords.w,
-          y2: coords.cy
-        }, grid);
-        clock.createElement('line', {
-          x1: coords.cx,
-          y1: 0,
-          x2: coords.cx,
-          y2: coords.h
-        }, grid);
-  
+          
         var line = clock.createElement('line', {
           x1: coords.cx,
           y1: coords.cy,
           x2: coords.cx,
           y2: coords.cy,
         });
-        
-        var amplitude = clock.createElement('circle', {
-          cx: coords.cx,
-          cy: coords.cy,
-          r: 1
-        }, grid);
-  
+
+
+
         var boundary = clock.createElement('circle', {
           cx: coords.cx,
           cy: coords.cy,
           r: coords.cy,
           style: 'stroke-opacity:0.075;'
         });
-        
-  
-        var angle_ref = clock.createElement('text', {
-          x: coords.cx,
-          y: coords.cy,
-          dy: 5,
-          dx: -10
-        }, note);
-  
+
         var radius_ref = clock.createElement('text', {
           x: coords.cx + 100,
           y: coords.cy + 100,
@@ -78,30 +142,71 @@
           dx: -10
         }, note);
   
-        
-  
-        // document.body.style.height = window.innerHeight + 'px';
-  
         boundary.addEventListener('mousemove', function (evt) {
           var radius    = Math.sqrt((evt.layerX - coords.cx).square() + (coords.cy - evt.layerY).square());
-          var theta = Math.round(evt.theta());
-          var color = colors[Math.floor(((theta > 0 ? theta : theta + 360) / 360) * colors.length)];
-          var benchmark =  theta + (radius / (coords.cy * 10)).toFixed(3).substring(1);
+          var theta = evt.theta() - (Math.PI / 2);
+          var deg = theta * (180 / Math.PI);
+          deg = Math.floor(deg > 0 ? deg : deg + 360);
+
+          var benchmark =  theta.toPrecision(4) + ',' + (radius / (coords.cy)).toPrecision(2);
+    
+          radius_ref.textContent = benchmark;
+          
+          
+          var idx = domain[legend[deg]];
+
+          
+          var eighth = (Math.PI / 8);
+          var wedge = {
+              r: radius,
+              mx: coords.cx,
+              my: coords.cy,
+              x1: Math.cos(theta - eighth) * radius + coords.cx,
+              y1: Math.sin(theta - eighth) * radius + coords.cy,
+              x2: Math.cos(theta + eighth) * radius + coords.cx,
+              y2: Math.sin(theta + eighth) * radius + coords.cy,
+            };
+ 
+          amplitude.set({
+            d: "M{mx},{my}L{x1},{y1}A{r},{r},1 0 1 {x2}, {y2}z".format(wedge),
+            style: 'stroke:none;fill-opacity:0.75;fill:' + idx.color
+          });
+    
+  
+          var rad = (theta - 90) * Math.PI / 180;
+                    
+          radius_ref.set({
+            x: evt.layerX,
+            y: evt.layerY,
+            dy: 25 * Math.sin(rad) + 5,
+            dx: 35 * Math.cos(rad)
+          });
+          
+          
+          
+          
+    
+
+        }, false);
+        
+        boundary.addEventListener('mouseout', function (evt) {
+          var radius = 0;
+          var theta = 0;
+          var benchmark =  '';
     
           radius_ref.textContent = benchmark;
     
           line.set({
-            x2: evt.layerX,
-            y2: evt.layerY
+            x2: coords.cx,
+            y2: coords.cy
           });
     
     
-          amplitude.set({'r': radius, 'style': 'stroke:none;fill-opacity:0.1;fill:' + color});
-    
+          amplitude.set({'r': 0, 'style': 'stroke:none;fill-opacity:0.1;fill:none'});
     
           radius_ref.set({
-            x: evt.layerX,
-            y: evt.layerY
+            x: coords.cx,
+            y: coords.cy
           });
     
 

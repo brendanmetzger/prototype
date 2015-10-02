@@ -37,4 +37,11 @@ class Graph extends \bloc\controller
     $view->main = 'views/prompt.html';
     return $view->render($this());
   }
+  
+  public function GETanalyzer()
+  {
+    $view = new \bloc\view('views/layout.html');
+    $view->main = 'views/analyzer.html';
+    return $view->render($this());
+  }
 }
