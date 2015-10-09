@@ -67,18 +67,20 @@ Graph.prototype = {
       }, container).textContent = this.domain[i].title;
     }
   },
-  getPolar: function (evt) {    
+  getPolar: function (evt) {
+    var t = evt.theta() - (Math.PI / 2);
     return {
       radius: Math.sqrt((evt.layerX - this.coords.cx).square() + (this.coords.cy - evt.layerY).square()),
-      theta: evt.theta() - (Math.PI / 2)
+      theta: t < -Math.PI ? t + (Math.PI * 2) : t
     };
   },
   watch: function (evt) {
     var p = this.getPolar(evt);
+    
     var deg = p.theta * (180 / Math.PI);
         deg = Math.floor(deg > 0 ? deg : deg + 360);
-
     var segment = this.domain[this.legend[deg]];
+        
     var arclen = (Math.PI / this.domain.length) * (p.radius / this.coords.cy);
     var wedge = {
         r: p.radius,
@@ -96,6 +98,7 @@ Graph.prototype = {
     });
   },
   record: function (evt) {
+    this.amplitude.set('d', "M0,0L0,0A0,0,1 0 1 0, 0z");
     this.observers.forEach(function (observer) {
       observer.notify(evt, this);
     }, this);

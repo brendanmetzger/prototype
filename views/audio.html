@@ -22,29 +22,104 @@
       width:70%;
       text-align:center;
     }
+    
+    .progress {
+      position:relative;
+    }
+
+    .progress .handle {
+      stroke-opacity:0;
+      transition:stroke-opacity 0.75s;
+    }
+
+    .progress:hover .handle {
+      stroke:#888 !important;
+      stroke-width:4;
+      stroke-opacity:1;
+    }
+    
+    
+    .progress svg {
+      width:100%;
+      height:100%;
+      fill:none;
+      margin: 0;
+      stroke:#000;
+      position: relative;
+      stroke-width:5;
+      stroke-opacity:0.75;
+    }
+
+
+    .progress strong, .progress .handle {
+      pointer-events: none;
+    }
+
+
+    .progress circle {
+      stroke:rgba(0,0,0,0.25);
+      stroke-width:1px;
+      fill:none;
+      pointer-events: none;
+    }
+    
+    .progress strong {
+      top:50%;
+      line-height:0;
+      left:0;
+      color:#777;
+
+    }
+
+    .progress strong {
+      position:absolute;
+      height:100%;
+      width:100%;
+      height:auto;
+      text-align:center;
+    }
+    
+    fieldset {
+      margin:0;
+      padding:0;
+      border:none;
+    }
+    fieldset input {
+      width:20%;
+      margin:0;
+      display:block;
+      float:left;
+      box-sizing:border-box;
+      border-width:0 1px 1px 0;
+    }
+    
+    body.locked #info {
+      opacity:0;
+    }
+    
     /* ]]> */
   </style>
   
   <section>
     <form method="post" action="graph/update">
-      <label for="queued">Queued</label>
-      <input type="text" name="src" value="" id="queued" />
-      
-      <input type="hidden" name="plot[t][]" value="" />
-      <input type="hidden" name="plot[t][]" value="" />
-      <input type="hidden" name="plot[t][]" value="" />
-      <input type="hidden" name="plot[t][]" value="" />
-      <input type="hidden" name="plot[t][]" value="" />
-      <input type="hidden" name="plot[r][]" value="" />
-      <input type="hidden" name="plot[r][]" value="" />
-      <input type="hidden" name="plot[r][]" value="" />
-      <input type="hidden" name="plot[r][]" value="" />
-      <input type="hidden" name="plot[r][]" value="" />
-      
-      <br/>
+      <input type="hidden" name="src" value="" id="queued" />
+      <fieldset name="theta">
+        <input type="number" name="plot[t][]" value="" />
+        <input type="number" name="plot[t][]" value="" />
+        <input type="number" name="plot[t][]" value="" />
+        <input type="number" name="plot[t][]" value="" />
+        <input type="number" name="plot[t][]" value="" />
+      </fieldset>
+      <fieldset name="radius">
+        <input type="number" name="plot[r][]" value="" />
+        <input type="number" name="plot[r][]" value="" />
+        <input type="number" name="plot[r][]" value="" />
+        <input type="number" name="plot[r][]" value="" />
+        <input type="number" name="plot[r][]" value="" />
+      </fieldset>
       <label>
-        <h5>Scrub</h5>
-        <input type="range" value="1.0" min="0" max="100" step="1" oninput="player.seek(Number(this.value) / 100);" />
+        <p>Scrub</p>
+        <input type="range" value="1.0" min="0" max="100" step="5" oninput="player.seek((Number(this.value) - 1) / 100);" style="display:block;width:100%;" />
       </label>
     </form>
   
@@ -56,99 +131,120 @@
     </ul>
   
   </section>
-  <section>
-    <h1>Pick a track.</h1>
+  <section id="info">
   </section>
   <script type="text/javascript">
-    bloc.embed('./js/player.js', './js/backdrop.js', './js/graph.js');
+    // <![CDATA[
+      bloc.embed('./js/player.js', './js/backdrop.js', './js/graph.js');
     
-    var player = null;
+      var player = null;
 
     
 
-    bloc.prepare('player', function () {
+      bloc.prepare('player', function () {
 
-      var ul = document.body.querySelector('ul.clickable');
-      var tracks = ul.querySelectorAll('li');
+        var ul = document.body.querySelector('ul.clickable');
+        var tracks = ul.querySelectorAll('li');
             
-      player = new Player([].map.call(tracks, function (item, idx) {
-                            item.dataset.idx = idx;
-                            return item.dataset.src;
-                          }));
-      ul.addEventListener('click', function (evt) {
-        if (evt.target.nodeName !== 'LI') return;
+        player = new Player([].map.call(tracks, function (item, idx) {
+                              item.dataset.idx = idx;
+                              return item.dataset.src;
+                            }));
+        ul.addEventListener('click', function (evt) {
+          if (evt.target.nodeName !== 'LI') return;
         
-        var idx = Number(evt.target.dataset.idx);
+          var idx = Number(evt.target.dataset.idx);
         
-        [].forEach.call(tracks, function (node) {
-          node.removeAttribute('class');
-        });
+          [].forEach.call(tracks, function (node) {
+            node.removeAttribute('class');
+          });
         
-        evt.target.className = 'active';
-        player.play(idx);
-      }, false);
+          evt.target.className = 'active';
+          player.play(idx);
+        }, false);
 
       
-      window.backdrop = new Backdrop();
+        window.backdrop = new Backdrop();
       
-      var div = window.backdrop.appendChild(document.createElement('div'));
-          div.style.margin = "5em auto";
-          div.style.height = '70vh';
-          div.style.width = '70vh';
+        var div = window.backdrop.appendChild(document.createElement('div'));
+            div.style.margin = '5vh auto'
+            div.style.height = '90vh';
+            div.style.width = '90vh';
           
-          var domain = [
-            {
-              color:'#EAF7B4',
-              title:'control'
-            },
-            {
-              color:'#98F698',
-              title:'relaxation'
-            },
-            {
-              color:'#C1E8E1',
-              title:'boredom'
-            },
-            {
-              color:'#98B7E6',
-              title:'apathy'
-            },
-            {
-              color:'#D9CDEC',
-              title:'worry'
-            },
-            {
-              color:'#F69898',
-              title:'anxiety'
-            },
-            {
-              color:'#F8EBB5',
-              title:'arousal'
-            },
-            {
-              color:'#F6F697',
-              title:'flow'
-            }
-          ];
-          
-           window.backdrop.show();
-          
-           var graph = new Graph(div, domain);
-               graph.register(player);
-           
-           window.backdrop.hide();
+        var domain = [
+          {
+            color:'#EAF7B4',
+            title:'control'
+          },
+          {
+            color:'#98F698',
+            title:'relaxation'
+          },
+          {
+            color:'#C1E8E1',
+            title:'boredom'
+          },
+          {
+            color:'#98B7E6',
+            title:'apathy'
+          },
+          {
+            color:'#D9CDEC',
+            title:'worry'
+          },
+          {
+            color:'#F69898',
+            title:'anxiety'
+          },
+          {
+            color:'#F8EBB5',
+            title:'arousal'
+          },
+          {
+            color:'#F6F697',
+            title:'flow'
+          }
+        ];
+      
+         window.backdrop.show();
+      
+         var graph = new Graph(div, domain);
+             graph.register(player);
+       
+         window.backdrop.hide();
          
       
-      document.body.addEventListener('dblclick', player.toggle.bind(player), false);
-      
-      
-      var r = new Request({
-        load: function (evt) {
-          console.log(evt.target.responseText);
+        document.body.addEventListener('dblclick', player.toggle.bind(player), false);
+        var info = document.getElementById('info');
+        var size = info.getBoundingClientRect();
+        var dimension = size.width + 'px';
+        if (size.width > size.height) {
+          dimension = size.height + 'px';
         }
-      });
-      r.post('graph/update', {'item': ['one', 'two']});
+        
+        var progress = new Progress(info);
+        
+        progress.element.style.height = progress.element.style.width = dimension;
+
+        var form = document.querySelector('form');
+        
+        player.register('timeupdate', progress);
+        player.register('form', function (index, theta, radius) {
+          form.theta.children[index].value = theta;
+          form.radius.children[index].value = radius;
+          
+          
+          if (index >= 4) {
+            new Request({
+              load: function (evt) {
+                console.log(evt.target.responseText);
+              }
+            }).post(form.action, new FormData(form));            
+          }
+        });
+
       
-    });
+      });
+    // ]]>
   </script>
 </main>

@@ -107,19 +107,7 @@ Request.prototype = {
   },
   post: function (url, data) {
     this.request.open('POST', url);
-    var fd = new FormData();
-    for(var key in data) {
-      if (data[key] instanceof Array) {
-        for (var i = 0; i < data[key].length; i++) {
-          fd.append(key + '['+i+']', data[key][i]);
-        }
-      } else {
-        fd.append(key, data[key]);
-      }
-      
-    }
-        
-    this.request.send(fd);
+    this.request.send(data);
   }
 };
 
@@ -203,7 +191,7 @@ var Progress = function(container) {
   });
   
   
-  this.update = function(percentage, text, mouseover) {
+  this.notify = function(percentage, text, mouseover) {
     message.innerHTML = text || message.innerHTML;
     
     var radian = (2 * Math.PI) * percentage;

@@ -1,6 +1,6 @@
 
 
-var Player = function (playlist) {
+var Player = function (playlist, form) {
   this.list = playlist;
   
   this.audio = new Audio();
@@ -15,19 +15,22 @@ var Player = function (playlist) {
     element.volume = ratio >= 1 ? this.to : ( ratio * ( this.to - this.from ) ) + this.from;
     return (ratio < 1);
   });
-  
-  this.request = new Request({
-    load: function (evt) {
-      console.log(evt.target.responseText);
-    }
-  });
-  
 };
+
 
 Player.prototype = {
   index: null,
   allow: true,
   rate: 1,
+  form: null,
+  formindex: null,
+  observer: {
+    timeupdate: null,
+    form: null
+  },
+  register: function (method, observer) {
+    this.observer[method] = observer;
+  },
   play: function (track) {
     if (typeof track === 'number' && this.index != track) {
       this.index = track;
@@ -49,23 +52,25 @@ Player.prototype = {
     }
   },
   ended: function (evt) {
-    console.log('send the data!');
-    this.request.post('graph/update', {'item1': ['one', 'two', 'three']});
     this.index++;
   },
   timeupdate: function (evt) {
-    var complete = Math.round((this.audio.currentTime / this.audio.duration) * 1000) / 1000;
-    if (this.allow && ((complete % 0.25) === 0)) {
-      this.trigger(complete/0.25);
+    if (this.allow) {
+      var complete = Math.round((this.audio.currentTime / this.audio.duration) * 1000) / 1000;
+      if ((complete % 0.25) === 0) {
+        this.allow = false;
+        this.trigger(complete/0.25);
+      }
+      this.observer.timeupdate.notify(complete, (complete * 100).toFixed(1) + '%');
     }
   },
   playing: function (evt) {
    // ... 
   },
   trigger: function (index) {
-    this.allow = false;
+    this.formindex = index;
+    window.backdrop.show();
     this.fade(0, function () {
-      window.backdrop.show();
       this.audio.pause(); 
     }.bind(this));
   },
@@ -82,18 +87,10 @@ Player.prototype = {
     });
   },
   notify: function (evt, subject) {
-    window.backdrop.hide();
     var p = subject.getPolar(evt);
+    this.observer.form.call(this, this.formindex, p.theta.toPrecision(4), (p.radius / (subject.coords.cy)).toPrecision(2));
     this.fade(1);
-    var benchmark =  p.theta.toPrecision(4) + ',' + (p.radius / (subject.coords.cy)).toPrecision(2);
-    console.log(benchmark);
+    window.backdrop.hide();
   }
 };
 
-
-
-
-
-var Dataset = function () {
-  
-};
