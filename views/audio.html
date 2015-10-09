@@ -1,58 +1,154 @@
-<main>
-  <nav style="position:relative;z-index:100">
-    <label>
-      <strong>Speed</strong>
-      <input type="range"  value="1.0" min="1.0" max="3" step="0.5" oninput="player.audio.playbackRate = this.value;" />
-    </label>
-    <label>
-      <strong>Scrub</strong>
-      <input type="range" value="1.0" min="0" max="100" step="1" oninput="player.seek(Number(this.value) / 100);" />
-    </label>
-  </nav>
+<main class="container">
+  <style type="text/css" media="screen">
+    /* <![CDATA[ */
+    form {
+      margin:0;
+    }
+    section {
+      float:left;
+      height:100vh;
+      box-sizing:border-box;
+    }
+    
+    section:first-of-type {
+      width:30%;
+      padding:3em 1em 1em;
+      background-color:#f8f8f8;
+    }
+    
+    
+    
+    section:last-of-type {
+      width:70%;
+      text-align:center;
+    }
+    /* ]]> */
+  </style>
   
+  <section>
+    <form method="post" action="graph/update">
+      <label for="queued">Queued</label>
+      <input type="text" name="src" value="" id="queued" />
+      
+      <input type="hidden" name="plot[t][]" value="" />
+      <input type="hidden" name="plot[t][]" value="" />
+      <input type="hidden" name="plot[t][]" value="" />
+      <input type="hidden" name="plot[t][]" value="" />
+      <input type="hidden" name="plot[t][]" value="" />
+      <input type="hidden" name="plot[r][]" value="" />
+      <input type="hidden" name="plot[r][]" value="" />
+      <input type="hidden" name="plot[r][]" value="" />
+      <input type="hidden" name="plot[r][]" value="" />
+      <input type="hidden" name="plot[r][]" value="" />
+      
+      <br/>
+      <label>
+        <h5>Scrub</h5>
+        <input type="range" value="1.0" min="0" max="100" step="1" oninput="player.seek(Number(this.value) / 100);" />
+      </label>
+    </form>
+  
+  
+  
+    <ul class="clickable">
+      <!-- iterate tracks -->
+      <li data-src="[$@src]">[Play $@title]</li>
+    </ul>
+  
+  </section>
+  <section>
+    <h1>Pick a track.</h1>
+  </section>
   <script type="text/javascript">
-    bloc.embed('./js/player.js');
+    bloc.embed('./js/player.js', './js/backdrop.js', './js/graph.js');
+    
     var player = null;
-    var tracks = [
-      'assets/audio/Bucket_Boys.m4a',
-      'assets/audio/CPS_Excellence.m4a',
-      'assets/audio/Jordan.m4a',
-      'assets/audio/Poop.m4a',
-      'assets/audio/Riverview.m4a',
-      'assets/audio/Stargazing.m4a',
-      'assets/audio/White_Poverty.m4a',
-      'assets/audio/Skyline.m4a',
-      'assets/audio/Uptown.m4a',
-      'assets/audio/Swampland.m4a',
-    ];
+
     
 
     bloc.prepare('player', function () {
-      player = new Player(tracks);
 
-      var ul = document.body.appendChild(document.createElement('ul'));
-      
-      ul.classList.add('clickable');
+      var ul = document.body.querySelector('ul.clickable');
+      var tracks = ul.querySelectorAll('li');
+            
+      player = new Player([].map.call(tracks, function (item, idx) {
+                            item.dataset.idx = idx;
+                            return item.dataset.src;
+                          }));
       ul.addEventListener('click', function (evt) {
         if (evt.target.nodeName !== 'LI') return;
+        
         var idx = Number(evt.target.dataset.idx);
-
-        [].forEach.call(ul.childNodes, function (node) {
+        
+        [].forEach.call(tracks, function (node) {
           node.removeAttribute('class');
         });
         
         evt.target.className = 'active';
         player.play(idx);
       }, false);
+
       
-      tracks.forEach(function (track, idx) {
-        var li = ul.appendChild(document.createElement('li'));
-        li.dataset.idx = idx;
-        li.textContent = 'play ' + track;
-      });
+      window.backdrop = new Backdrop();
       
+      var div = window.backdrop.appendChild(document.createElement('div'));
+          div.style.margin = "5em auto";
+          div.style.height = '70vh';
+          div.style.width = '70vh';
+          
+          var domain = [
+            {
+              color:'#EAF7B4',
+              title:'control'
+            },
+            {
+              color:'#98F698',
+              title:'relaxation'
+            },
+            {
+              color:'#C1E8E1',
+              title:'boredom'
+            },
+            {
+              color:'#98B7E6',
+              title:'apathy'
+            },
+            {
+              color:'#D9CDEC',
+              title:'worry'
+            },
+            {
+              color:'#F69898',
+              title:'anxiety'
+            },
+            {
+              color:'#F8EBB5',
+              title:'arousal'
+            },
+            {
+              color:'#F6F697',
+              title:'flow'
+            }
+          ];
+          
+           window.backdrop.show();
+          
+           var graph = new Graph(div, domain);
+               graph.register(player);
+           
+           window.backdrop.hide();
+         
       
       document.body.addEventListener('dblclick', player.toggle.bind(player), false);
+      
+      
+      var r = new Request({
+        load: function (evt) {
+          console.log(evt.target.responseText);
+        }
+      });
+      r.post('graph/update', {'item': ['one', 'two']});
+      
     });
   </script>
 </main>

@@ -2,9 +2,47 @@ body {
   font-family:'Avenir Next';
   font-weight:400;
   margin:0;
-  height:95vh;
-  padding-top:5vh;
+  height:100vh;
 }
+
+h1, h2 {
+  font-weight:200;
+}
+
+h1 {
+  font-size:5em;
+}
+h2 {
+  font-size:3.5em;
+}
+
+main.backdrop {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  box-shadow: inset 0 0 10em rgba(0,0,0,0.15);
+  background-color:rgba(255,255,255,0.9);
+  display:none;
+  z-index:10000;
+  opacity:0;
+}
+
+main.backdrop.viewing {
+  display:block;
+  opacity:1;
+}
+
+main.backdrop.measure {
+  display:block;
+  visibility:hidden;
+}
+
+.locked {
+  overflow:hidden;
+}
+
 
 body > header {
   position:fixed;
@@ -25,16 +63,7 @@ header nav ul li {
   padding:0.25em;
 }
 
-body[class] {
-  background:transparent url(flow-diagram.svg) no-repeat -35px 20px;
-  background-size: 100% 100%;
-}
-
 svg#trace {
-  position:absolute;
-  z-index:0;
-  top:0;
-  left:0;
 }
 
 svg line {
@@ -59,16 +88,60 @@ svg circle {
 ul.clickable {
   list-style:none;
   padding:0;
-  margin:1em;
 }
 ul.clickable li {
   cursor:pointer;
-  border:1px solid #333;
+  border:1px solid #aaa;
   padding:0.25em;
-  margin:0.25em;
+  margin:0.125em 0;
 }
 
 ul.clickable li:hover, li.active {
   background-color:#333;
   color:#fff;
 }
+
+
+button.close {
+  position:absolute;
+  top:-3em;
+  right:-3em;
+  height:2em;
+  width:2em;
+  line-height:0;
+  padding:0.25em;
+  border-radius:0.25em;
+  border:1px solid #ccc;
+  background-color:#fff;
+}
+
+text {
+  text-anchor: middle;
+  font-family:Avenir, Helvetica;
+  font-weight:200;
+}
+
+.grid text {
+  fill:#555;
+  letter-spacing:0.25em;
+}
+
+.grid path {
+  fill-opacity:0.5;
+}
+
+.grid path:hover {
+  fill-opacity:0.5;
+}
+
+.annotation text {
+  font-family:'Courier New';
+}
+
+
+@-webkit-keyframes spin { from {-webkit-transform:rotate(0deg) } to {-webkit-transform:rotate(360deg) } }
+@-moz-keyframes spin    { from {-moz-transform:rotate(0deg) }    to {-moz-transform:rotate(360deg) } }
+@keyframes spin         { from { transform:rotate(0deg) }        to { transform:rotate(360deg) } }
+
+
+.progress.spin svg{-moz-animation:spin .75s infinite linear;-webkit-animation:spin .75s infinite linear;-ms-animation:spin .75s infinite linear;animation:spin .75s infinite linear;}

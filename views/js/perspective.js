@@ -1,5 +1,6 @@
 var paper;
 bloc.prepare('perspective', function () {
+  getCoords();
   paper = new SVG(document.body, {
     height: coords.h,
     width: coords.w,

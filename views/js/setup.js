@@ -12,7 +12,7 @@ String.prototype.format = function() {
 
 Event.prototype.theta = function () {
   var rect  = this.target.getBoundingClientRect();
-  var offset = [(this.offsetX || this.layerX) - rect.left, (this.offsetY || this.layerY) - rect.top];
+  var offset = [(this.offsetX || this.layerX), (this.offsetY || this.layerY)];
   return Math.atan2(offset[0] - (rect.width / 2), (rect.height / 2) - offset[1]);
 };
 
@@ -105,9 +105,21 @@ Request.prototype = {
     this.request.open('GET', url);
     this.request.send();
   },
-  post: function (url) {
+  post: function (url, data) {
     this.request.open('POST', url);
-    this.request.send();
+    var fd = new FormData();
+    for(var key in data) {
+      if (data[key] instanceof Array) {
+        for (var i = 0; i < data[key].length; i++) {
+          fd.append(key + '['+i+']', data[key][i]);
+        }
+      } else {
+        fd.append(key, data[key]);
+      }
+      
+    }
+        
+    this.request.send(fd);
   }
 };
 
@@ -153,9 +165,60 @@ var getCoords = function(evt) {
   };
 };
 
-window.addEventListener('resize', getCoords, false);
 
+var Progress = function(container) {  
+  var svg, path, handle, message;
+  this.element = document.createElement('div');
+  this.element.className = 'progress';
+  if (container) {
+    container.appendChild(this.element);
+    this.remove = function () {
+      container.removeChild(this.element);
+    };
+  }
+  message = this.element.appendChild(document.createElement('strong'));
 
-getCoords();
+  svg = new SVG(this.element, {
+    height: 50,
+    width: 50,
+    viewBox: '0 0 100 100'
+  });
+  
+  svg.createElement('circle', {
+    'cx': 50,
+    'cy': 50,
+    'r': 35
+  });
+  
+  handle = svg.createElement('path', {
+    'd': 'M50,50',
+    'class': 'handle',
+    'transform': 'rotate(-90 50 50)'
+  });
+  
 
+  path = svg.createElement('path', {
+    'd': 'M50,50',
+    'transform': 'rotate(-90 50 50)'
+  });
+  
+  
+  this.update = function(percentage, text, mouseover) {
+    message.innerHTML = text || message.innerHTML;
+    
+    var radian = (2 * Math.PI) * percentage;
+    var x = (Math.cos(radian) * 35) + 50;
+    var y = (Math.sin(radian) * 35) + 50;
+    
+    var data = "M85,50A35,35 0 " + (y < 50 ? 1 : 0) + "1 " + x + "," + y;
+    if (mouseover) {
+      handle.setAttribute('d', data);
+    } else {
+      path.setAttribute('d', data);
+    }
+  };
+  
+  
 
+  return this;
+};

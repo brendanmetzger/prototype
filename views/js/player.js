@@ -6,17 +6,22 @@ var Player = function (playlist) {
   this.audio = new Audio();
   this.audio.preload = 'metadata';
   
-  
   ['ended', 'timeupdate', 'playing'].forEach(function (trigger) {
     this.audio.addEventListener(trigger, this[trigger].bind(this), false);
   }.bind(this));
   
   this.fader =  Animate(function (element) {
     var ratio = Math.min(1, 1 - Math.pow(1 - (Date.now() - this.start) / this.duration, 5)); // float % anim complete 
-    var A = ratio >= 1 ? this.to : ( ratio * ( this.to - this.from ) ) + this.from;
-    element.volume = A;
+    element.volume = ratio >= 1 ? this.to : ( ratio * ( this.to - this.from ) ) + this.from;
     return (ratio < 1);
   });
+  
+  this.request = new Request({
+    load: function (evt) {
+      console.log(evt.target.responseText);
+    }
+  });
+  
 };
 
 Player.prototype = {
@@ -28,7 +33,6 @@ Player.prototype = {
       this.index = track;
       this.audio.src = this.list[this.index];
     }
-    
     this.audio.play();
   },
   pause: function () {
@@ -45,30 +49,30 @@ Player.prototype = {
     }
   },
   ended: function (evt) {
-    //...
+    console.log('send the data!');
+    this.request.post('graph/update', {'item1': ['one', 'two', 'three']});
+    this.index++;
   },
   timeupdate: function (evt) {
     var complete = Math.round((this.audio.currentTime / this.audio.duration) * 1000) / 1000;
     if (this.allow && ((complete % 0.25) === 0)) {
-      this.trigger();
-    } else {
-      console.log(complete);
+      this.trigger(complete/0.25);
     }
   },
   playing: function (evt) {
    // ... 
   },
-  trigger: function () {
+  trigger: function (index) {
     this.allow = false;
     this.fade(0, function () {
-      showSpecialScreen();
+      window.backdrop.show();
       this.audio.pause(); 
     }.bind(this));
-    
   },
   fade: function (to, callback) {
     if (to === 1 && this.audio.paused) {
       this.audio.play();
+      this.allow = true;
     }
     this.fader.start(this.audio, {
       duration: 1500,
@@ -76,31 +80,20 @@ Player.prototype = {
       to: to,
       finish: callback || function () {}
     });
+  },
+  notify: function (evt, subject) {
+    window.backdrop.hide();
+    var p = subject.getPolar(evt);
+    this.fade(1);
+    var benchmark =  p.theta.toPrecision(4) + ',' + (p.radius / (subject.coords.cy)).toPrecision(2);
+    console.log(benchmark);
   }
 };
 
-var div = document.body.appendChild(document.createElement('div'));
-div.style.height    = '80vh';
-div.style.width     = '80vw';
-div.style.margin    = '10vh 10vw';
-div.style.border    = '1px solid #333';
-div.style.padding   = '5em';
-div.style.boxSizing = 'border-box';
-div.style.position  = 'absolute';
-div.style.top       = 0;  
-div.style.display   = 'none';
-div.textContent     = "click anywhere to resume";
-
-div.style.backgroundColor = 'rgba(255,255,255,0.85)';
-
-div.addEventListener('click', function (evt) {
-  div.style.display = 'none';
-  player.fade(1);
-  player.allow = true;
-}, false);
 
 
-function showSpecialScreen() {
-  div.style.display = "block";
+
+
+var Dataset = function () {
   
-}
+};
