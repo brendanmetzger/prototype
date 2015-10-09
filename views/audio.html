@@ -142,7 +142,7 @@
     
 
       bloc.prepare('player', function () {
-
+        var form = document.querySelector('form');
         var ul = document.body.querySelector('ul.clickable');
         var tracks = ul.querySelectorAll('li');
             
@@ -150,6 +150,7 @@
                               item.dataset.idx = idx;
                               return item.dataset.src;
                             }));
+        
         ul.addEventListener('click', function (evt) {
           if (evt.target.nodeName !== 'LI') return;
         
@@ -160,6 +161,8 @@
           });
         
           evt.target.className = 'active';
+          form.reset();
+          form.src.value = evt.target.dataset.src;
           player.play(idx);
         }, false);
 
@@ -226,7 +229,7 @@
         
         progress.element.style.height = progress.element.style.width = dimension;
 
-        var form = document.querySelector('form');
+        
         
         player.register('timeupdate', progress);
         player.register('form', function (index, theta, radius) {

@@ -49,7 +49,7 @@ class Graph extends \bloc\controller
   
   public function POSTupdate($request)
   {
-    $element  = \Models\Graph::ID('assets/audio/Bucket_Boys.m4a');
+    $element  = \Models\Graph::ID($_POST['src']);
     $document = $element->ownerDocument;
 
     $plot = $element->appendChild($document->createElement('plot'));
